@@ -65,12 +65,11 @@ function draw() {
   
   // Check coin collection
   for (let coin of coins) {
-    if (!coin.collected) {
-      let distance = dist(posX, posY - 25, coin.x, coin.y);
-      if (distance < 25) {
-        coin.collected = true;
-        coinCount++;
-      }
+    if (!coin.collected && 
+        posX > coin.x - 20 && posX < coin.x + 20 && 
+        posY > coin.y - 20 && posY < coin.y + 20) {
+      coin.collected = true;
+      coinCount++;
     }
   }
   
