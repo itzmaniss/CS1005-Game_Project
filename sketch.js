@@ -103,24 +103,28 @@ function startGame() {
   }
 
   // Create collectables at different x positions
-  let coinX = 300;
-  let coinsCreated = 0;
-  let maxCoins = 50;
+  let maxCoins = 20;
+  let levelLength = 11500; // From 300 to 11800
+  let baseSpacing = levelLength / maxCoins; // Approximately 575 pixels per coin
   
-  while (coinsCreated < maxCoins && coinX < 11800) {
+  for (let i = 0; i < maxCoins; i++) {
+    let coinX = 300 + (i * baseSpacing) + getRandomInt(-100, 100);
     let coinY = getRandomInt(145, 255);
     
-    // Only add coin if it doesn't overlap with canyon
-    if (!overlapsCanyon(coinX, 30)) {
+    // Shift coin if it overlaps with canyon
+    while (overlapsCanyon(coinX, 30) && coinX < 11800) {
+      coinX += 50;
+    }
+    
+    // Only add coin if it's still within bounds
+    if (coinX < 11800) {
       collectables.push({
         x_pos: coinX,
         y_pos: coinY,
         size: 30,
         isFound: false,
       });
-      coinsCreated++;
     }
-    coinX += getRandomInt(220, 280);
   }
 
   // Create canyons at different x positions
