@@ -104,8 +104,8 @@ function checkCheckpointActivation() {
 function checkCanyonCollision() {
   for (let i = 0; i < canyons.length; i++) {
     if (
-      gameChar_x > canyons[i].x_pos &&
-      gameChar_x < canyons[i].x_pos + canyons[i].width &&
+      gameChar_x + 5 > canyons[i].x_pos &&
+      gameChar_x - 5 < canyons[i].x_pos + canyons[i].width &&
       gameChar_y >= floorPos_y &&
       isPlummeting == false
     ) {
@@ -116,7 +116,7 @@ function checkCanyonCollision() {
 
 function handleCanyonFalling() {
   if (isPlummeting == true) {
-    gameChar_y = gameChar_y + 5;
+    gameChar_y = gameChar_y + 8;
     velocityX = 0;
     velocityY = 0;
 

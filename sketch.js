@@ -43,7 +43,7 @@ const cloudSpeed = -0.25;
 
 function setup() {
   createCanvas(1024, 576);
-  floorPos_y = 300;
+  floorPos_y = 350;
   lives = 3;
   startGame();
 }
@@ -51,7 +51,7 @@ function setup() {
 function startGame() {
   // Reset game character variables
   gameChar_x = 200;
-  gameChar_y = 300;
+  gameChar_y = 350;
   gameChar_width = 30;
   velocityX = 0;
   velocityY = 0;
@@ -94,7 +94,7 @@ function startGame() {
   // Create trees at different x positions
   let treeX = -200;
   while (treeX < 12500) {
-    trees.push({ x_pos: treeX + getRandomInt(-50, 50), y_pos: 240 });
+    trees.push({ x_pos: treeX + getRandomInt(-50, 50), y_pos: 290 });
     treeX += getRandomInt(120, 180);
   }
 
@@ -103,7 +103,7 @@ function startGame() {
   while (mountainX < 12500) {
     mountainRange.push({
       x_pos: mountainX + getRandomInt(-100, 100),
-      y_pos: 300,
+      y_pos: 350,
     });
     mountainX += getRandomInt(350, 450);
   }
@@ -115,7 +115,7 @@ function startGame() {
 
   for (let i = 0; i < maxCoins; i++) {
     let coinX = 300 + i * baseSpacing + getRandomInt(-100, 100);
-    let coinY = getRandomInt(145, 255);
+    let coinY = getRandomInt(195, 305);
 
     // Shift coin if it overlaps with canyon
     while (overlapsCanyon(coinX, 30) && coinX < 11800) {
@@ -178,7 +178,7 @@ function startGame() {
         let platformX = eagleX - getRandomInt(100, 200); // Platform before eagle
         let platformWidth = getRandomInt(60, 80);
         let platformHeight = getRandomInt(10, 15);
-        let platformY = getRandomInt(220, 250); // High in the sky to avoid walking eagles
+        let platformY = getRandomInt(270, 300); // High in the sky to avoid walking eagles
         
         // Only add if platform doesn't overlap canyon and is within bounds
         if (platformX > 300 && !overlapsCanyon(platformX, platformWidth + 20)) {
@@ -381,6 +381,7 @@ function handleMovement() {
 }
 
 function keyPressed() {
+  console.log(keyCode);
   if (lives < 1 || flagpole.isReached) {
     if (key === "R" || key === "r") {
       lives = 3;
@@ -402,7 +403,7 @@ function keyPressed() {
         facing = "right";
         isWalking = true;
       }
-    } else if (key === " " || keyCode == 38) {
+    } else if (key === " " || keyCode == 38 || keyCode == 87) {
       if (isFalling == false) {
         velocityY = -12;
         isFalling = true;
