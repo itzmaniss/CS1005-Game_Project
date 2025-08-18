@@ -33,6 +33,10 @@ let collectables;
 let canyons;
 let checkpoints;
 let flagpole;
+let platforms;
+
+//Game enemy variables
+let eagles;
 
 // Movement constants
 const cloudSpeed = -0.25;
@@ -77,6 +81,8 @@ function startGame() {
   collectables = [];
   canyons = [];
   checkpoints = [];
+  platforms = [];
+  eagles = [];
 
   noStroke();
 
@@ -153,6 +159,41 @@ function startGame() {
 
   // Initialize flagpole
   flagpole = { x_pos: 12000, isReached: false };
+
+  //Create eagles at different x positions and platforms for walking eagles
+  let eagleX = 500;
+  while (eagleX < 11500) {
+    let eagleType = getRandomInt(0, 2) === 0 ? "walking" : "flying";
+    let eagleY = getRandomInt(175, 200);
+
+    //ensure walking eagles dont walk over canyons
+    if (eagleType === "walking") {
+      eagleY = floorPos_y; //update Eagle Y position to floor level
+      while (overlapsCanyon(eagleX, 200)) {
+        eagleX += 50; // Shift right by 50 pixels
+      }
+      
+      // Create platform near walking eagle (50% chance for tactical placement)
+      if (getRandomInt(0, 2) === 0) {
+        let platformX = eagleX - getRandomInt(100, 200); // Platform before eagle
+        let platformWidth = getRandomInt(60, 80);
+        let platformHeight = getRandomInt(10, 15);
+        let platformY = getRandomInt(220, 250); // High in the sky to avoid walking eagles
+        
+        // Only add if platform doesn't overlap canyon and is within bounds
+        if (platformX > 300 && !overlapsCanyon(platformX, platformWidth + 20)) {
+          platforms.push({
+            x_pos: platformX,
+            y_pos: platformY,
+            width: platformWidth,
+            height: platformHeight
+          });
+        }
+      }
+    }
+    eagles.push(new Eagle(eagleX, eagleY, eagleType));
+    eagleX += getRandomInt(600, 1000);
+  }
 }
 
 function draw() {
@@ -196,9 +237,13 @@ function draw() {
   drawTrees();
   drawCollectableCoins();
   drawCanyons();
+  drawPlatforms();
   drawCheckpoints();
   drawFlagpole();
   drawCharacter();
+  drawEagles();
+  updateEagles();
+  checkEagleCollisions();
 
   pop();
 
@@ -260,7 +305,28 @@ function applyPhysics() {
       velocityX = 0;
     }
 
-    if (gameChar_y >= floorPos_y) {
+    // Check platform collisions first
+    let onPlatform = false;
+    for (let i = 0; i < platforms.length; i++) {
+      let platform = platforms[i];
+      
+      // Check if character is above platform and falling onto it
+      if (gameChar_x + 15 > platform.x_pos && 
+          gameChar_x - 15 < platform.x_pos + platform.width &&
+          gameChar_y >= platform.y_pos && 
+          gameChar_y <= platform.y_pos + platform.height + 10 &&
+          velocityY >= 0) {
+        gameChar_y = platform.y_pos;
+        velocityY = 0;
+        velocityX = 0;
+        isFalling = false;
+        onPlatform = true;
+        break;
+      }
+    }
+    
+    // Check floor collision if not on platform
+    if (!onPlatform && gameChar_y >= floorPos_y) {
       gameChar_y = floorPos_y;
       velocityY = 0;
       velocityX = 0;

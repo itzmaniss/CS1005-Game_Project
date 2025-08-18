@@ -109,3 +109,22 @@ function drawCanyons() {
     }
   }
 }
+
+function drawPlatforms() {
+  for (let i = 0; i < platforms.length; i++) {
+    if (
+      platforms[i].x_pos > cameraPosX - 200 &&
+      platforms[i].x_pos < cameraPosX + width + 200
+    ) {
+      fill(101, 67, 33);
+      noStroke();
+      rect(platforms[i].x_pos, platforms[i].y_pos, platforms[i].width, platforms[i].height);
+      
+      // Add some texture/detail
+      fill(139, 69, 19);
+      rect(platforms[i].x_pos, platforms[i].y_pos, platforms[i].width, 2);
+      fill(160, 82, 45);
+      rect(platforms[i].x_pos + 2, platforms[i].y_pos + 2, platforms[i].width - 4, platforms[i].height - 4);
+    }
+  }
+}
