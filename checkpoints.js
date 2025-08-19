@@ -119,8 +119,9 @@ function handleCanyonFalling() {
     gameChar_y = gameChar_y + 8;
     velocityX = 0;
     velocityY = 0;
+    fallingSound.play();
 
-    if (gameChar_y > height + 100 && lives > 0) {
+    if (gameChar_y > height + 100 && lives > 0) {s
       handleDeath();
     }
 

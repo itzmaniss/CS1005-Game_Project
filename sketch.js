@@ -38,6 +38,16 @@ let platforms;
 //Game enemy variables
 let eagles;
 
+// Particle system variables
+let particles;
+
+// Sound variables
+let soundCounter;
+let collectSound;
+let dieSound;
+let jumpSound;
+let fallingSound;
+
 // Movement constants
 const cloudSpeed = -0.25;
 
@@ -48,7 +58,35 @@ function setup() {
   startGame();
 }
 
+function preload() {
+  soundCounter = 0;
+  soundFormats("mp3");
+
+
+  collectSound = loadSound('assets/collect.mp3', soundFileLoaded);
+  dieSound = loadSound('assets/die.mp3', soundFileLoaded); 
+  jumpSound = loadSound('assets/jump.mp3', soundFileLoaded); 
+  fallingSound = loadSound('assets/falling.mp3', soundFileLoaded);
+}
+
+function soundFileLoaded() {
+  soundCounter++;
+}
+
+
 function startGame() {
+  while (soundCounter!=4){
+      console.log("Sounds not loaded yet");
+      return;
+    }
+    if (soundCounter == 4) {
+      console.log("Sounds loaded successfully");
+      collectSound.setVolume(0.2); 
+      dieSound.setVolume(0.2);
+      jumpSound.setVolume(0.2);
+      fallingSound.setVolume(0.2);
+      console.log("Sound volumes set");
+    }
   // Reset game character variables
   gameChar_x = 200;
   gameChar_y = 350;
@@ -83,6 +121,7 @@ function startGame() {
   checkpoints = [];
   platforms = [];
   eagles = [];
+  particles = [];
 
   noStroke();
 
@@ -136,7 +175,7 @@ function startGame() {
   // Create canyons at different x positions
   let canyonX = getRandomInt(400, 800);
   while (canyonX < 11500) {
-    canyons.push({ x_pos: canyonX, width: getRandomInt(105, 127) });
+    canyons.push({ x_pos: canyonX, width: getRandomInt(105, 117) });
     canyonX += getRandomInt(600, 1000);
   }
 
@@ -244,6 +283,8 @@ function draw() {
   drawEagles();
   updateEagles();
   checkEagleCollisions();
+  updateParticles();
+  drawParticles();
 
   pop();
 
@@ -267,6 +308,7 @@ function draw() {
 function handleDeath() {
   if (lives > 1) {
     lives--;
+    dieSound.play();
     gameChar_x = spawnX;
     gameChar_y = floorPos_y;
     velocityX = 0;
@@ -405,6 +447,7 @@ function keyPressed() {
       }
     } else if (key === " " || keyCode == 38 || keyCode == 87) {
       if (isFalling == false) {
+        jumpSound.play();
         velocityY = -12;
         isFalling = true;
         isWalking = false;

@@ -49,7 +49,52 @@ function checkCoinCollection() {
         collectables[i].isFound = true;
         coinCount = coinCount + 1;
         gameScore = gameScore + 1;
+        createCoinParticles(collectables[i].x_pos, collectables[i].y_pos);
+        collectSound.play();
       }
     }
+  }
+}
+
+// Particle system for coin collection effects
+function createCoinParticles(x, y) {
+  for (let i = 0; i < 8; i++) {
+    particles.push({
+      x: x,
+      y: y,
+      vx: random(-3, 3),
+      vy: random(-5, -2),
+      life: 30,
+      maxLife: 30,
+      size: random(3, 6),
+      color: {
+        r: random(200, 255),
+        g: random(180, 255),
+        b: random(0, 50)
+      }
+    });
+  }
+}
+
+function updateParticles() {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    let p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.1;
+    p.life--;
+    
+    if (p.life <= 0) {
+      particles.splice(i, 1);
+    }
+  }
+}
+
+function drawParticles() {
+  for (let particle of particles) {
+    let alpha = map(particle.life, 0, particle.maxLife, 0, 255);
+    fill(particle.color.r, particle.color.g, particle.color.b, alpha);
+    noStroke();
+    ellipse(particle.x, particle.y, particle.size, particle.size);
   }
 }
