@@ -10,7 +10,7 @@ function Eagle(x, y, type) {
   if (this.type === "walking") {
     this.Lbarrier = this.position.x - 200; // Barrier for walking eagles
     this.Rbarrier = this.position.x + 200; // Barrier for walking eagles
-    this.velocity = createVector(-1, 0); // Slower speed for walking
+    this.velocity = createVector(-2, 0); // Slower speed for walking
     this.lookRight = false; // Default direction for walking eagles
   }
   // Flying eagle specific properties

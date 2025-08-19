@@ -213,23 +213,19 @@ function startGame() {
       }
       
       // Create platform near walking eagle (50% chance for tactical placement)
-      if (getRandomInt(0, 2) === 0) {
-        let platformX = eagleX - getRandomInt(100, 200); // Platform before eagle
-        let platformWidth = getRandomInt(60, 80);
-        let platformHeight = getRandomInt(10, 15);
-        let platformY = getRandomInt(270, 300); // High in the sky to avoid walking eagles
+      let platformX = eagleX - getRandomInt(100, 200); // Platform before eagle
+      let platformWidth = getRandomInt(60, 80);
+      let platformHeight = getRandomInt(10, 15);
+      let platformY = getRandomInt(260, 280); // High in the sky to avoid walking eagles
         
         // Only add if platform doesn't overlap canyon and is within bounds
-        if (platformX > 300 && !overlapsCanyon(platformX, platformWidth + 20)) {
-          platforms.push({
-            x_pos: platformX,
-            y_pos: platformY,
-            width: platformWidth,
-            height: platformHeight
-          });
-        }
-      }
-    }
+        platforms.push({
+          x_pos: platformX,
+          y_pos: platformY,
+          width: platformWidth,
+          height: platformHeight
+        });
+      } 
     eagles.push(new Eagle(eagleX, eagleY, eagleType));
     eagleX += getRandomInt(600, 1000);
   }
