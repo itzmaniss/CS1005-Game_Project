@@ -1,3 +1,7 @@
+// Game state variables
+let gameState;
+let selectedDifficulty;
+
 // Game character variables
 let gameChar_x;
 let gameChar_y;
@@ -48,25 +52,59 @@ let dieSound;
 let jumpSound;
 let fallingSound;
 
+// Image variables
+let menuBackground;
+
 // Movement constants
 const cloudSpeed = -0.25;
+
+// Difficulty configurations
+const difficultySettings = {
+  easy: {
+    lives: 3,
+    alwaysSpawnPlatforms: true,
+    eagleSpeed: 2,
+    eagleSpacing: { min: 600, max: 1000 },
+    canyonWidth: { min: 105, max: 117 },
+    flyingEagleHeight: 120
+  },
+  medium: {
+    lives: 3,
+    alwaysSpawnPlatforms: false,
+    eagleSpeed: 3,
+    eagleSpacing: { min: 500, max: 800 },
+    canyonWidth: { min: 115, max: 120 },
+    flyingEagleHeight: 175
+  },
+  hard: {
+    lives: 2,
+    alwaysSpawnPlatforms: false,
+    eagleSpeed: 3.5,
+    eagleSpacing: { min: 500, max: 800 },
+    canyonWidth: { min: 115, max: 120 },
+    flyingEagleHeight: 175,
+    flyingSineWave: true
+  }
+};
 
 function setup() {
   createCanvas(1024, 576);
   floorPos_y = 350;
   lives = 3;
-  startGame();
+  gameState = "menu";
+  selectedDifficulty = null;
 }
 
 function preload() {
   soundCounter = 0;
   soundFormats("mp3");
 
-
   collectSound = loadSound('assets/collect.mp3', soundFileLoaded);
   dieSound = loadSound('assets/die.mp3', soundFileLoaded); 
   jumpSound = loadSound('assets/jump.mp3', soundFileLoaded); 
   fallingSound = loadSound('assets/falling.mp3', soundFileLoaded);
+  
+  menuBackground = loadImage('assets/image.png');
 }
 
 function soundFileLoaded() {
@@ -87,6 +125,11 @@ function startGame() {
       fallingSound.setVolume(0.2);
       console.log("Sound volumes set");
     }
+
+  // Get current difficulty settings
+  const currentDifficulty = difficultySettings[selectedDifficulty];
+  lives = currentDifficulty.lives;
+    
   // Reset game character variables
   gameChar_x = 200;
   gameChar_y = 350;
@@ -175,7 +218,7 @@ function startGame() {
   // Create canyons at different x positions
   let canyonX = getRandomInt(400, 800);
   while (canyonX < 11500) {
-    canyons.push({ x_pos: canyonX, width: getRandomInt(105, 117) });
+    canyons.push({ x_pos: canyonX, width: getRandomInt(currentDifficulty.canyonWidth.min, currentDifficulty.canyonWidth.max) });
     canyonX += getRandomInt(600, 1000);
   }
 
@@ -203,7 +246,7 @@ function startGame() {
   let eagleX = 500;
   while (eagleX < 11500) {
     let eagleType = getRandomInt(0, 2) === 0 ? "walking" : "flying";
-    let eagleY = getRandomInt(175, 200);
+    let eagleY = eagleType === "flying" ? currentDifficulty.flyingEagleHeight : getRandomInt(175, 200);
 
     //ensure walking eagles dont walk over canyons
     if (eagleType === "walking") {
@@ -212,12 +255,13 @@ function startGame() {
         eagleX += 50; // Shift right by 50 pixels
       }
       
-      // Create platform near walking eagle (50% chance for tactical placement)
-      let platformX = eagleX - getRandomInt(100, 200); // Platform before eagle
-      let platformWidth = getRandomInt(60, 80);
-      let platformHeight = getRandomInt(10, 15);
-      let platformY = getRandomInt(260, 280); // High in the sky to avoid walking eagles
-        
+      // Create platform near walking eagle based on difficulty
+      if (currentDifficulty.alwaysSpawnPlatforms || getRandomInt(0, 2) === 0) {
+        let platformX = eagleX - getRandomInt(100, 200); // Platform before eagle
+        let platformWidth = getRandomInt(60, 80);
+        let platformHeight = getRandomInt(10, 15);
+        let platformY = getRandomInt(260, 280); // High in the sky to avoid walking eagles
+          
         // Only add if platform doesn't overlap canyon and is within bounds
         platforms.push({
           x_pos: platformX,
@@ -225,13 +269,19 @@ function startGame() {
           width: platformWidth,
           height: platformHeight
         });
+      }
       } 
-    eagles.push(new Eagle(eagleX, eagleY, eagleType));
-    eagleX += getRandomInt(600, 1000);
+    eagles.push(new Eagle(eagleX, eagleY, eagleType, selectedDifficulty));
+    eagleX += getRandomInt(currentDifficulty.eagleSpacing.min, currentDifficulty.eagleSpacing.max);
   }
 }
 
 function draw() {
+  if (gameState === "menu") {
+    drawMenu();
+    return;
+  }
+
   // Game over condition
   if (lives < 1) {
     fill(255, 0, 0);
@@ -244,7 +294,7 @@ function draw() {
   }
 
   // Level complete condition
-  if (flagpole.isReached) {
+  if (flagpole && flagpole.isReached) {
     fill(0, 255, 0);
     textAlign(CENTER, CENTER);
     textSize(48);
@@ -290,7 +340,7 @@ function draw() {
   if (lives >= 1) {
     checkCoinCollection();
     checkCheckpointActivation();
-    if (!flagpole.isReached) {
+    if (flagpole && !flagpole.isReached) {
       checkFlagpole();
     }
     checkCanyonCollision();
@@ -418,12 +468,120 @@ function handleMovement() {
   }
 }
 
+function drawMenu() {
+  background(menuBackground);
+  
+  // Game title
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(64);
+  text("CANYON DASH", width / 2, height / 4);
+  
+  // Difficulty selection title
+  textSize(32);
+  text("SELECT DIFFICULTY", width / 2, height / 2 + 10);
+  
+  // Difficulty buttons
+  let buttonWidth = 150;
+  let buttonHeight = 50;
+  let buttonX = width / 2 - buttonWidth / 2;
+  let startY = height / 2 + 50;
+  let buttonPadding = 5;
+  
+  // Easy button
+  let easyY = startY;
+  if (mouseX > buttonX && mouseX < buttonX + buttonWidth && 
+      mouseY > easyY && mouseY < easyY + buttonHeight) {
+    fill(100, 255, 100);
+  } else {
+    fill(150, 255, 150);
+  }
+  rect(buttonX, easyY, buttonWidth, buttonHeight);
+  fill(0);
+  textSize(20);
+  text("EASY", buttonX + buttonWidth/2, easyY + buttonHeight/2);
+  
+  // Medium button
+  let mediumY = easyY + buttonHeight + buttonPadding;
+  fill(255);
+  if (mouseX > buttonX && mouseX < buttonX + buttonWidth && 
+      mouseY > mediumY && mouseY < mediumY + buttonHeight) {
+    fill(255, 255, 100);
+  } else {
+    fill(255, 255, 150);
+  }
+  rect(buttonX, mediumY, buttonWidth, buttonHeight);
+  fill(0);
+  text("MEDIUM", buttonX + buttonWidth/2, mediumY + buttonHeight/2);
+  
+  // Hard button
+  let hardY = mediumY + buttonHeight + buttonPadding;
+  fill(255);
+  if (mouseX > buttonX && mouseX < buttonX + buttonWidth && 
+      mouseY > hardY && mouseY < hardY + buttonHeight) {
+    fill(255, 100, 100);
+  } else {
+    fill(255, 150, 150);
+  }
+  rect(buttonX, hardY, buttonWidth, buttonHeight);
+  fill(0);
+  text("HARD", buttonX + buttonWidth/2, hardY + buttonHeight/2);
+  
+  // Instructions
+  fill(255);
+  textSize(16);
+  text("Click on a difficulty to start the game", width / 2, height * 9/10);
+}
+
+function mousePressed() {
+  if (gameState === "menu") {
+    let buttonWidth = 150;
+    let buttonHeight = 50;
+    let buttonX = width / 2 - buttonWidth / 2;
+    let startY = height / 2 + 50;
+    let buttonPadding = 5;
+    
+    // Check easy button
+    let easyY = startY;
+    if (mouseX > buttonX && mouseX < buttonX + buttonWidth && 
+        mouseY > easyY && mouseY < easyY + buttonHeight) {
+      selectedDifficulty = "easy";
+      gameState = "playing";
+      startGame();
+    }
+    
+    // Check medium button
+    let mediumY = easyY + buttonHeight + buttonPadding;
+    if (mouseX > buttonX && mouseX < buttonX + buttonWidth && 
+        mouseY > mediumY && mouseY < mediumY + buttonHeight) {
+      selectedDifficulty = "medium";
+      gameState = "playing";
+      startGame();
+    }
+    
+    // Check hard button
+    let hardY = mediumY + buttonHeight + buttonPadding;
+    if (mouseX > buttonX && mouseX < buttonX + buttonWidth && 
+        mouseY > hardY && mouseY < hardY + buttonHeight) {
+      selectedDifficulty = "hard";
+      gameState = "playing";
+      startGame();
+    }
+  }
+}
+
 function keyPressed() {
   console.log(keyCode);
+  
+  if (gameState === "menu") {
+    return;
+  }
+  
   if (lives < 1 || flagpole.isReached) {
     if (key === "R" || key === "r") {
       lives = 3;
-      startGame();
+      gameState = "menu";
+      selectedDifficulty = null;
     }
     return;
   }

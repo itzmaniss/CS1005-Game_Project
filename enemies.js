@@ -1,16 +1,21 @@
 // enemies.js
-function Eagle(x, y, type) {
+function Eagle(x, y, type, difficulty) {
   this.position = createVector(x, y);
   this.size = 40;
   this.type = type; // "walking" or "flying"
   this.width = 50;
   this.height = 30;
   this.isActive = true;
+  this.difficulty = difficulty;
+
+  // Get difficulty settings
+  const settings = difficultySettings[difficulty];
+  const speed = settings ? settings.eagleSpeed : 0.2;
 
   if (this.type === "walking") {
     this.Lbarrier = this.position.x - 200; // Barrier for walking eagles
     this.Rbarrier = this.position.x + 200; // Barrier for walking eagles
-    this.velocity = createVector(-2, 0); // Slower speed for walking
+    this.velocity = createVector(-speed, 0);
     this.lookRight = false; // Default direction for walking eagles
   }
   // Flying eagle specific properties
@@ -19,7 +24,8 @@ function Eagle(x, y, type) {
     this.frequency = 0.05;
     this.baseY = y;
     this.time = 0;
-    this.velocity = createVector(-2, 0);
+    this.velocity = createVector(-speed, 0);
+    this.useSineWave = settings && settings.flyingSineWave;
   }
   
   this.update = function() {
@@ -42,7 +48,13 @@ function Eagle(x, y, type) {
     // Flying eagles have vertical movement as well as moving Left
     if (this.type === "flying") {
       this.time += this.frequency;
-      this.position.y = this.baseY + sin(this.time) * this.amplitude;
+      if (this.useSineWave) {
+        // Hard mode: sine wave movement
+        this.position.y = this.baseY + sin(this.time) * this.amplitude;
+      } else {
+        // Easy/Medium mode: straight flight
+        this.position.y = this.baseY;
+      }
     }
     
     // Remove if off screen
