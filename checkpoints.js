@@ -1,142 +1,139 @@
-
 function drawCheckpoints() {
-  for (let i = 0; i < checkpoints.length; i++) {
-    if (
-      checkpoints[i].x_pos > cameraPosX - 200 &&
-      checkpoints[i].x_pos < cameraPosX + width + 200
-    ) {
-      fill(139, 69, 19);
-      rect(checkpoints[i].x_pos - 3, checkpoints[i].y_pos, 6, 80);
+    for (let i = 0; i < checkpoints.length; i++) {
+        if (
+            checkpoints[i].xPos > cameraPosX - CAMERA_BUFFER &&
+            checkpoints[i].xPos < cameraPosX + width + CAMERA_BUFFER
+        ) {
+            fill(139, 69, 19);
+            rect(checkpoints[i].xPos - 3, checkpoints[i].yPos, 6, 80);
 
-      if (checkpoints[i].isActivated) {
-        fill(0, 255, 0);
-      } else {
-        fill(255, 0, 0);
-      }
+            if (checkpoints[i].isActivated) {
+                fill(0, 255, 0);
+            } else {
+                fill(255, 0, 0);
+            }
 
-      triangle(
-        checkpoints[i].x_pos + 3,
-        checkpoints[i].y_pos,
-        checkpoints[i].x_pos + 3,
-        checkpoints[i].y_pos + 20,
-        checkpoints[i].x_pos + 30,
-        checkpoints[i].y_pos + 10,
-      );
+            triangle(
+                checkpoints[i].xPos + 3,
+                checkpoints[i].yPos,
+                checkpoints[i].xPos + 3,
+                checkpoints[i].yPos + 20,
+                checkpoints[i].xPos + 30,
+                checkpoints[i].yPos + 10,
+            );
+        }
     }
-  }
 }
 
 function drawFlagpole() {
-  if (
-    flagpole.x_pos > cameraPosX - 200 &&
-    flagpole.x_pos < cameraPosX + width + 200
-  ) {
-    fill(139, 69, 19);
-    rect(flagpole.x_pos - 5, floorPos_y - 250, 10, 250);
+    if (
+        flagpole.xPos > cameraPosX - CAMERA_BUFFER &&
+        flagpole.xPos < cameraPosX + width + CAMERA_BUFFER
+    ) {
+        fill(139, 69, 19);
+        rect(flagpole.xPos - 5, floorPosY - 250, 10, 250);
 
-    if (flagpole.isReached) {
-      fill(0, 255, 0);
-      triangle(
-        flagpole.x_pos + 5,
-        floorPos_y - 250,
-        flagpole.x_pos + 5,
-        floorPos_y - 210,
-        flagpole.x_pos + 65,
-        floorPos_y - 230,
-      );
-    } else {
-      fill(255, 0, 0);
-      triangle(
-        flagpole.x_pos + 5,
-        floorPos_y - 210,
-        flagpole.x_pos + 5,
-        floorPos_y - 170,
-        flagpole.x_pos + 65,
-        floorPos_y - 190,
-      );
+        if (flagpole.isReached) {
+            fill(0, 255, 0);
+            triangle(
+                flagpole.xPos + 5,
+                floorPosY - 250,
+                flagpole.xPos + 5,
+                floorPosY - 210,
+                flagpole.xPos + 65,
+                floorPosY - 230,
+            );
+        } else {
+            fill(255, 0, 0);
+            triangle(
+                flagpole.xPos + 5,
+                floorPosY - 210,
+                flagpole.xPos + 5,
+                floorPosY - 170,
+                flagpole.xPos + 65,
+                floorPosY - 190,
+            );
+        }
     }
-  }
 }
 
 function checkFlagpole() {
-  if (flagpole.isReached == false) {
-    let charLeft = gameChar_x - 15;
-    let charRight = gameChar_x + 15;
+    if (!flagpole.isReached) {
+        let charLeft = gameCharX - CHAR_HALF_WIDTH;
+        let charRight = gameCharX + CHAR_HALF_WIDTH;
 
-    let flagpoleLeft = flagpole.x_pos - 20;
-    let flagpoleRight = flagpole.x_pos + 20;
+        let flagpoleLeft = flagpole.xPos - 20;
+        let flagpoleRight = flagpole.xPos + 20;
 
-    if (charRight > flagpoleLeft && charLeft < flagpoleRight) {
-      flagpole.isReached = true;
+        if (charRight > flagpoleLeft && charLeft < flagpoleRight) {
+            flagpole.isReached = true;
+        }
     }
-  }
 }
-
 
 function checkCheckpointActivation() {
-  for (let i = 0; i < checkpoints.length; i++) {
-    if (checkpoints[i].isActivated == false) {
-      let charLeft = gameChar_x - 15;
-      let charRight = gameChar_x + 15;
-      let charTop = gameChar_y - 60;
-      let charBottom = gameChar_y;
+    for (let i = 0; i < checkpoints.length; i++) {
+        if (!checkpoints[i].isActivated) {
+            let charLeft = gameCharX - CHAR_HALF_WIDTH;
+            let charRight = gameCharX + CHAR_HALF_WIDTH;
+            let charTop = gameCharY - CHAR_HEIGHT;
+            let charBottom = gameCharY;
 
-      let checkpointLeft = checkpoints[i].x_pos - 25;
-      let checkpointRight = checkpoints[i].x_pos + 25;
-      let checkpointTop = checkpoints[i].y_pos - 5;
-      let checkpointBottom = checkpoints[i].y_pos + 45;
+            let checkpointLeft = checkpoints[i].xPos - 25;
+            let checkpointRight = checkpoints[i].xPos + 25;
+            let checkpointTop = checkpoints[i].yPos - 5;
+            let checkpointBottom = checkpoints[i].yPos + 45;
 
-      if (
-        charRight > checkpointLeft &&
-        charLeft < checkpointRight &&
-        charBottom > checkpointTop &&
-        charTop < checkpointBottom
-      ) {
-        checkpoints[i].isActivated = true;
-        currentCheckpoint = i;
-        spawnX = checkpoints[i].x_pos;
-      }
+            if (
+                charRight > checkpointLeft &&
+                charLeft < checkpointRight &&
+                charBottom > checkpointTop &&
+                charTop < checkpointBottom
+            ) {
+                checkpoints[i].isActivated = true;
+                currentCheckpoint = i;
+                spawnX = checkpoints[i].xPos;
+            }
+        }
     }
-  }
 }
 
-
 function checkCanyonCollision() {
-  for (let i = 0; i < canyons.length; i++) {
-    if (
-      gameChar_x + 5 > canyons[i].x_pos &&
-      gameChar_x - 5 < canyons[i].x_pos + canyons[i].width &&
-      gameChar_y >= floorPos_y &&
-      isPlummeting == false
-    ) {
-      isPlummeting = true;
+    for (let i = 0; i < canyons.length; i++) {
+        if (
+            gameCharX + CANYON_COLLISION_BUFFER > canyons[i].xPos &&
+            gameCharX - CANYON_COLLISION_BUFFER < canyons[i].xPos + canyons[i].width &&
+            gameCharY >= floorPosY &&
+            !isPlummeting
+        ) {
+            isPlummeting = true;
+        }
     }
-  }
 }
 
 function handleCanyonFalling() {
-  if (isPlummeting == true) {
-    gameChar_y = gameChar_y + 8;
-    velocityX = 0;
-    velocityY = 0;
-    fallingSound.play();
+    if (isPlummeting) {
+        gameCharY = gameCharY + CANYON_FALL_SPEED;
+        velocityX = 0;
+        velocityY = 0;
+        fallingSound.play();
 
-    if (gameChar_y > height + 100 && lives > 0) {s
-      handleDeath();
-    }
+        if (gameCharY > height + 100 && lives > 0) {
+            handleDeath();
+        }
 
-    for (let i = 0; i < canyons.length; i++) {
-      if (
-        gameChar_x > canyons[i].x_pos &&
-        gameChar_x < canyons[i].x_pos + canyons[i].width
-      ) {
-        if (gameChar_x < canyons[i].x_pos) {
-          gameChar_x = canyons[i].x_pos;
+        for (let i = 0; i < canyons.length; i++) {
+            if (
+                gameCharX > canyons[i].xPos &&
+                gameCharX < canyons[i].xPos + canyons[i].width
+            ) {
+                if (gameCharX < canyons[i].xPos) {
+                    gameCharX = canyons[i].xPos;
+                }
+                if (gameCharX > canyons[i].xPos + canyons[i].width) {
+                    gameCharX = canyons[i].xPos + canyons[i].width;
+                }
+            }
         }
-        if (gameChar_x > canyons[i].x_pos + canyons[i].width) {
-          gameChar_x = canyons[i].x_pos + canyons[i].width;
-        }
-      }
     }
-  }
 }
