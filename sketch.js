@@ -91,6 +91,12 @@ const CHAR_HEIGHT = 60;
 const PLATFORM_COLLISION_BUFFER = 10;
 const CANYON_COLLISION_BUFFER = 5;
 
+// Platform constants (re-exported from platforms.js for consistency)
+const PLATFORM_WIDTH_MIN = 60;
+const PLATFORM_WIDTH_MAX = 80;
+const PLATFORM_HEIGHT_MIN = 10;
+const PLATFORM_HEIGHT_MAX = 15;
+
 // Difficulty configurations
 const difficultySettings = {
     easy: {
@@ -155,7 +161,6 @@ function startGame() {
     jumpSound.setVolume(SOUND_VOLUME);
     fallingSound.setVolume(SOUND_VOLUME);
     console.log("Sound volumes set");
-
 
     // Get current difficulty settings
     const currentDifficulty = difficultySettings[selectedDifficulty];
@@ -300,18 +305,9 @@ function startGame() {
                 currentDifficulty.alwaysSpawnPlatforms ||
                 getRandomInt(0, 2) === 0
             ) {
-                let platformX = eagleX - getRandomInt(100, 200); // Platform before eagle
-                let platformWidth = getRandomInt(60, 80);
-                let platformHeight = getRandomInt(10, 15);
-                let platformY = getRandomInt(260, 280); // High in the sky to avoid walking eagles
-
-                // Only add if platform doesn't overlap canyon and is within bounds
-                platforms.push({
-                    xPos: platformX,
-                    yPos: platformY,
-                    width: platformWidth,
-                    height: platformHeight,
-                });
+                // Use factory pattern to create platform
+                const platform = createPlatform(eagleX);
+                platforms.push(platform);
             }
         }
         eagles.push(new Eagle(eagleX, eagleY, eagleType, selectedDifficulty));
@@ -449,7 +445,10 @@ function applyPhysics() {
                 gameCharX + CHAR_HALF_WIDTH > platform.xPos &&
                 gameCharX - CHAR_HALF_WIDTH < platform.xPos + platform.width &&
                 gameCharY >= platform.yPos &&
-                gameCharY <= platform.yPos + platform.height + PLATFORM_COLLISION_BUFFER &&
+                gameCharY <=
+                    platform.yPos +
+                        platform.height +
+                        PLATFORM_COLLISION_BUFFER &&
                 velocityY >= 0
             ) {
                 gameCharY = platform.yPos;

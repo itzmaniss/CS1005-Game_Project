@@ -102,7 +102,8 @@ function checkCanyonCollision() {
     for (let i = 0; i < canyons.length; i++) {
         if (
             gameCharX + CANYON_COLLISION_BUFFER > canyons[i].xPos &&
-            gameCharX - CANYON_COLLISION_BUFFER < canyons[i].xPos + canyons[i].width &&
+            gameCharX - CANYON_COLLISION_BUFFER <
+                canyons[i].xPos + canyons[i].width &&
             gameCharY >= floorPosY &&
             !isPlummeting
         ) {

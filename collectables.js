@@ -47,10 +47,7 @@ function checkCoinCollection() {
                 collectables[i].isFound = true;
                 coinCount = coinCount + 1;
                 gameScore = gameScore + 1;
-                createCoinParticles(
-                    collectables[i].xPos,
-                    collectables[i].yPos,
-                );
+                createCoinParticles(collectables[i].xPos, collectables[i].yPos);
                 collectSound.play();
             }
         }

@@ -214,7 +214,12 @@ function drawEagles() {
 
 function checkEagleCollisions() {
     for (let eagle of eagles) {
-        const collision = eagle.checkCollision(gameCharX, gameCharY, GAME_CHAR_WIDTH, CHAR_HEIGHT);
+        const collision = eagle.checkCollision(
+            gameCharX,
+            gameCharY,
+            GAME_CHAR_WIDTH,
+            CHAR_HEIGHT,
+        );
         if (collision) {
             if (lives > 0) {
                 handleDeath();

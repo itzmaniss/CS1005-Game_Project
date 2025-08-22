@@ -142,3 +142,13 @@ function drawPlatforms() {
         }
     }
 }
+
+// Simple platform factory function
+function createPlatform(eagleX) {
+    return {
+        xPos: eagleX - getRandomInt(100, 200),
+        yPos: getRandomInt(260, 280),
+        width: getRandomInt(60, 80),
+        height: getRandomInt(10, 15),
+    };
+}
